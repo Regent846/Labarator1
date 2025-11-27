@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  api-tests:
+    build: .
+    container_name: api-automation-tests
+    volumes:
+      - ./reports:/app/reports  # Монтируем папку для отчетов
+    environment:
+      - BASE_URL=https://jsonplaceholder.typicode.com
+      - ENV=docker
+      - LOG_LEVEL=INFO
+    command: ["pytest", "-n", "auto", "--alluredir=reports/allure"]
+
+  # Пример мок-сервера для тестирования (раскомментировать при необходимости)
+  # mock-api:
+  #   image: node:18-alpine
+  #   working_dir: /app
+  #   volumes:
+  #     - ./mock-data:/app
+  #   command: >
+  #     sh -c "npm install -g json-server &&
+  #            json-server --watch db.json --host 0.0.0.0 --port 3000"
+  #   ports:
+  #     - "3000:3000"
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:3000/posts"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+
+  # Сервис для просмотра Allure отчетов
+  allure:
+    image: frankescobar/allure-docker-service
+    container_name: allure-reporter
+    ports:
+      - "5050:5050"
+    environment:
+      - CHECK_RESULTS_EVERY_SECONDS=5
+      - KEEP_HISTORY=10
+    volumes:
+      - ./reports/allure:/app/allure-results
+    depends_on:
+      - api-tests

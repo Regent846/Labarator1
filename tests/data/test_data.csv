@@ -1,0 +1,10 @@
+test_type,param_value,expected_status,description,request_body
+user_get,1,200,valid_user_id,
+user_get,999,404,non_existent_user,
+user_get,0,404,zero_user_id,
+user_get,-1,404,negative_user_id,
+user_get,abc,404,string_user_id,
+post_get,1,200,valid_post_id,
+post_get,999,404,non_existent_post,
+post_get,"""""",404,empty_post_id,
+user_create,,201,,
